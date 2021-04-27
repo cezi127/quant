@@ -1,6 +1,7 @@
 from matplotlib import rcParams
 import matplotlib.pyplot as plt
 import numpy as np
+import math
 
 np.seterr(all='ignore')
 rcParams['figure.figsize'] = (14, 6)
@@ -18,7 +19,7 @@ S("000001.XSHG")  # 设置当前关注股票
 T("2016-06-01")   # 设置当前观察日期
 
 
-print(O, H, L, C)
+print(O, H, L, C, V)
 
 # # 短期1:=EMA(C,10);
 # # duanQi1 = EMA(C, 10)
@@ -54,63 +55,80 @@ maituo1 = duanqi1 > duanqi2 and duanqi2 > duanqi3 and \
             and changqi4>changqi5))
 
 maituo2 = duanqi1 > duanqi2 and duanqi2>duanqi3 and duanqi3>changqi1 and changqi1>changqi2 and changqi2>changqi3 and changqi3>changqi4 and changqi4>changqi5 and duanqi5/duanqi1<1.13
+print(maituo2)
 
-# # RSV:=(CLOSE-LLV(LOW,5))/(HHV(HIGH,5)-LLV(LOW,5))*100;
-# # K:=SMA(RSV,5,1);
-# # D:=SMA(K,5,5);
-# # J:=3*K-2*D;
-# # VARB2:=(RSV/2+22)*1;
-# # 量:=EMA(VOL,13);
-# # 资金:=EMA(AMOUNT,13);
-# # 过滤:=((资金 /量) / 100);
-# # 提纯:=(((CLOSE -过滤) / 过滤) * 100);
-# # 黄金:=((提纯 < (0)) AND ZXNH);
-# # 低买:=IF(黄金 AND RSV<VARB2-2,50,0);
-# # 高卖:=IF(黄金 AND RSV>VARB2,80,120);
-# # 上涨分界:=25;
-# # KDJ提前金叉:=(CROSS(上涨分界,低买));
+# RSV:=(CLOSE-LLV(LOW,5))/(HHV(HIGH,5)-LLV(LOW,5))*100;
+# K:=SMA(RSV,5,1);
+# D:=SMA(K,5,5);
+# J:=3*K-2*D;
+# VARB2:=(RSV/2+22)*1;
+# 量:=EMA(VOL,13);
+# 资金:=EMA(AMOUNT,13);
+# 过滤:=((资金 /量) / 100);
+# 提纯:=(((CLOSE -过滤) / 过滤) * 100);
+# 黄金:=((提纯 < (0)) AND ZXNH);
+# 低买:=IF(黄金 AND RSV<VARB2-2,50,0);
+# 高卖:=IF(黄金 AND RSV>VARB2,80,120);
+# 上涨分界:=25;
+# KDJ提前金叉:=(CROSS(上涨分界,低买));
 
-# rsv = (C - LLV(L, 5)) / (HHV(H, 5) - LLV(L, 5)) * 100
-# K = SMA(rsv, 5, 1)
-# D = SMA(K, 5, 5)
-# J = 3 * k - 2 * D
-# varb2 = (rsv / 2 + 22)
-# liang = EMA(V, 13)
-# zijin = EMA(A, 13)
-# guolv = ((zijin / liang) / 100)
-# tichun = (((C -guolv) / guolv) * 100)
-# huangjin = ((tichun < 0) and zxnh)
-# dimai = if(huangjin and rsv < varb2-2, 50, 0)
-# gaomai = if(huangj  and rsv > varb2, 80, 120)
-# shangzhangfenjie = 25
-# KDJjincha = CROSS(shangzhangfenjie, dimai)
+rsv = (C - LLV(L, 5)) / (HHV(H, 5) - LLV(L, 5)) * 100
+K = SMA(rsv, 5, 1)
+D = SMA(K, 5, 5)
+J = 3 * K - 2 * D
+varb2 = (rsv / 2 + 22)
+liang = EMA(V, 13)
+zijin = EMA(V, 13)
+guolv = ((zijin / liang) / 100)
+tichun = (((C -guolv) / guolv) * 100)
+huangjin = ((tichun < 0) and zxnh)
+dimai = 50 if huangjin and rsv < varb2-2 else 0
+gaomai = 80 if huangjin  and rsv > varb2 else 120
+shangzhangfenjie = 25
+KDJjincha = CROSS(shangzhangfenjie, dimai)
+print(KDJjincha)
 
-# DDIFF:=100*(EMA(CLOSE,12)-EMA(CLOSE,26));
-# DDEA:=EMA(DDIFF,9);
-# DMACD:=(DDIFF-DDEA)*2;
-# 死叉:=CROSS(DDEA,DDIFF);
-# N1:=BARSLAST(死叉);
-# N2:=REF(BARSLAST(死叉),N1+1);
-# N3:=REF(BARSLAST(死叉),N2+N1+2);
-# CL1:=LLV(LOW,N1+1);
-# DIFL1:=LLV(DDIFF,N1+1);
-# CL2:=REF(CL1,N1+1);
-# DIFL2:=REF(DIFL1,N1+1);
-# CL3:=REF(CL2,N1+1);
-# DIFL3:=REF(DIFL2,N1+1);
-# PDIFL2:=IF(DIFL2 > 0,INTPART(LOG(DIFL2))-1,INTPART(LOG(-DIFL2))-1);
-# MDIFL2:=INTPART(DIFL2/POW(10,PDIFL2));
-# PDIFL3:=IF(DIFL3 > 0,INTPART(LOG(DIFL3))-1,INTPART(LOG(-DIFL3))-1);
-# MDIFL3:=INTPART(DIFL3/POW(10,PDIFL3));
-# MDIFB2:=INTPART(DDIFF/POW(10,PDIFL2));
-# MDIFB3:=INTPART(DDIFF/POW(10,PDIFL3));
-# 直接底部结构:=(CL1 < CL2 ) AND (MDIFB2 > MDIFL2) AND DDIFF < 0 AND (DMACD < 0 AND REF(DMACD,1) < 0) AND MDIFB2 <= REF(MDIFB2,0);
-# 隔峰底部结构:=(CL1 < CL3 AND CL3 < CL2 ) AND (MDIFB3 > MDIFL3) AND (DMACD < 0 AND REF(DMACD,1) < 0) AND MDIFB3 <= REF(MDIFB3,0);
-# BG:=((MDIFB2 > REF(MDIFB2,1))*REF(直接底部结构,2)) OR ((MDIFB3 > REF(MDIFB3,2))*REF(隔峰底部结构,2));
-# P:=CROSS(DDIFF,DDEA);
-# 一买:=FILTER(BG AND P,DMACD>0);
+V1 = (C*2+H+L)/4*10
+V2 = EMA(V1,13)-EMA(V1,21)
+V3 = EMA(V2,5)
+V4 = 2*(V2-V3)*100
+choumajin = V4 if V4 >= 0 else 0
+choumaxiuzheng = False if choumajin<REF(choumajin,1) and REF(C/O>1,1) else True
 
-# ddiff = 100*(EMA(C, 12)-EMA(C, 26))
-# ddea = EMA(DDIFF, 9)
-# dmacd = (ddiff - ddea)*2
-# sicha = CROSS(ddea, ddiff)
+X_4 = MA((2*C+H+L)/4,5)
+X_6 = X_4*0.98
+X_25 = (MA(C,3)+MA(C,6)+MA(C,12)+MA(C,24))/4
+guaili = REF((X_6-X_25)/X_25*100,1)
+
+qiangshixian1 = HHV(MA((((L + H) + C) / 3),8),60)
+print(qiangshixian1)
+
+V11 = 3*SMA((C-LLV(L,55))/(HHV(H,55)-LLV(L,55))*100,5,1)-2*SMA(SMA((C-LLV(L,55))/(HHV(H,55)-LLV(L,55))*100,5,1),3,1)
+qushixian = EMA(V11, 3)
+
+DDIFF = 100*(EMA(C,12)-EMA(C,26))
+DDEA = EMA(DDIFF,9)
+DMACD = (DDIFF-DDEA)*2
+sicha = CROSS(DDEA,DDIFF)
+
+N1 = REF(BARSLAST(sicha), -1)
+N2 = REF(BARSLAST(sicha), N1 + 1)
+N3 = REF(BARSLAST(sicha), N1 + N2 + 1)
+
+CL1 = LLV(L, N1+1)
+DIFL1 = LLV(DDIFF,N1+1)
+CL2 = REF(CL1,N1+1)
+DIFL2 = REF(DIFL1, N1+1)
+CL3 = REF(CL2, N1+1)
+DIFL3 = REF(DIFL2, N1+1)
+PDIFL2 = INTPART(LOG(DIFL2)) - 1 if DIFL2 > 0 else INTPART(LOG(-1 * DIFL2))-1 #INTPART(LOG(DIFL2))-1 if DIFL2 > 0 else INTPART(LOG(-DIFL2))-1
+MDIFL2 = INTPART(DIFL2/POW(10,PDIFL2));
+PDIFL3 = INTPART(LOG(DIFL3))-1 if DIFL3 > 0 else INTPART(LOG(-1 * DIFL3))-1
+MDIFL3 = INTPART(DIFL3/POW(10,PDIFL3))
+MDIFB2 = INTPART(DDIFF/POW(10,PDIFL2))
+MDIFB3 = INTPART(DDIFF/POW(10,PDIFL3))
+zhijiedibujiegou = (CL1 < CL2 ) and (MDIFB2 > MDIFL2) and DDIFF < 0 and (DMACD < 0 and REF(DMACD,1) < 0) and MDIFB2 <= REF(MDIFB2,0)
+gefengdibujiegou = (CL1 < CL3 and CL3 < CL2 ) and (MDIFB3 > MDIFL3) and (DMACD < 0 and REF(DMACD,1) < 0) and MDIFB3 <= REF(MDIFB3,0)
+BG = ((MDIFB2 > REF(MDIFB2,1))*REF(zhijiedibujiegou,2)) or ((MDIFB3 > REF(MDIFB3,2))*REF(gefengdibujiegou,2));
+P = CROSS(DDIFF,DDEA) and ~(N1>=16 and O/REF(C,1)<1.05)
+buy = FILTER(BG and P, DMACD>0)
