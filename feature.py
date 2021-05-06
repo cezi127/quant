@@ -57,6 +57,52 @@ maituo1 = duanqi1 > duanqi2 and duanqi2 > duanqi3 and \
 maituo2 = duanqi1 > duanqi2 and duanqi2>duanqi3 and duanqi3>changqi1 and changqi1>changqi2 and changqi2>changqi3 and changqi3>changqi4 and changqi4>changqi5 and duanqi5/duanqi1<1.13
 print(maituo2)
 
+
+#
+VOL1 = 6
+DC = (2*C+H+L+O) / 5
+EMDC = EMA(EMA(EMA(DC,4),4),4)
+BBB = (EMDC-REF(EMDC,1))/REF(EMDC,1)*10
+BA = MA(BBB,VOL1)
+simu = (BBB-BA)*100
+
+FF = EMA(CLOSE,3)
+MA15 = EMA(CLOSE,21)
+guaidian = CROSS(FF,MA15)
+
+VAR11 = HHV(HIGH,25)
+VAR22 = LLV(LOW,25)
+VAR33 = EMA((CLOSE-VAR22)/(VAR11-VAR22)*100,20)
+VAR44 = EMA((CLOSE-VAR22)/(VAR11-VAR22)*100,5)
+duanqimai = CROSS(VAR44,VAR33)
+
+ZJ = (C+H+L)/3
+VAR1 = MA(ZJ,30)
+zhongxianqushi = VAR1+2.2*STD(ZJ,30)
+KS = (C-MA(C,13))/MA(C,13)*(-100)
+RKS = REF(KS,1)
+MLS = RKS/KS>=1.23 AND RKS>=8 AND C/REF(C,1)>=1.02
+FENG:=EMA(C,10);
+YUN:=EMA(KS/10+EMA(C,10),3);
+风云买:=CROSS(FENG,YUN);
+
+主力:=EMA( (CLOSE-MA(CLOSE,7))/MA(CLOSE,7)*480,2)*5;
+散户:=EMA( (CLOSE-MA(CLOSE,11))/MA(CLOSE,11)*480,7)*5;
+主力底:=CROSS(主力,散户) AND 主力<-10;
+
+TD:=REF(H,1)>HHV(REF(H,2),20);
+TDT:=BARSLAST(TD);
+
+X_4:=MA((2*CLOSE+HIGH+LOW)/4,5);
+X_6:=X_4*0.98;
+X_25:=(MA(CLOSE,3)+MA(CLOSE,6)+MA(CLOSE,12)+MA(CLOSE,24))/4;
+乖离:=REF((X_6-X_25)/X_25*100,1);
+
+强势线1:=HHV(MA((((LOW + HIGH) + CLOSE)/3),8),60);
+
+V11:=3*SMA((C-LLV(L,55))/(HHV(H,55)-LLV(L,55))*100,5,1)-2*SMA(SMA((C-LLV(L,55))/(HHV(H,55)-LLV(L,55))*100,5,1),3,1);
+趋势线:=EMA(V11,3);
+
 # RSV:=(CLOSE-LLV(LOW,5))/(HHV(HIGH,5)-LLV(LOW,5))*100;
 # K:=SMA(RSV,5,1);
 # D:=SMA(K,5,5);
