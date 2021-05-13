@@ -2,6 +2,7 @@ from matplotlib import rcParams
 import matplotlib.pyplot as plt
 import numpy as np
 import math
+import pandas as pd
 
 np.seterr(all='ignore')
 rcParams['figure.figsize'] = (14, 6)
@@ -14,9 +15,9 @@ from funcat.data.rqalpha_data_backend import RQAlphaDataBackend
 
 set_data_backend(TushareDataBackend())
 
-set_start_date("2015-01-01")
-S("000001.XSHG")  # 设置当前关注股票
-T("2016-06-01")   # 设置当前观察日期
+set_start_date("2020-01-01")
+S("300350.SZ")  # 设置当前关注股票
+T("2021-05-01")   # 设置当前观察日期
 
 
 print(O, H, L, C, V)
@@ -55,7 +56,8 @@ maituo1 = duanqi1 > duanqi2 and duanqi2 > duanqi3 and \
             and changqi4>changqi5))
 
 maituo2 = duanqi1 > duanqi2 and duanqi2>duanqi3 and duanqi3>changqi1 and changqi1>changqi2 and changqi2>changqi3 and changqi3>changqi4 and changqi4>changqi5 and duanqi5/duanqi1<1.13
-print(maituo2)
+
+print(maituo2.series.shape)
 
 
 #
@@ -66,14 +68,14 @@ BBB = (EMDC-REF(EMDC,1))/REF(EMDC,1)*10
 BA = MA(BBB,VOL1)
 simu = (BBB-BA)*100
 
-FF = EMA(CLOSE,3)
-MA15 = EMA(CLOSE,21)
+FF = EMA(C,3)
+MA15 = EMA(C,21)
 guaidian = CROSS(FF,MA15)
 
-VAR11 = HHV(HIGH,25)
-VAR22 = LLV(LOW,25)
-VAR33 = EMA((CLOSE-VAR22)/(VAR11-VAR22)*100,20)
-VAR44 = EMA((CLOSE-VAR22)/(VAR11-VAR22)*100,5)
+VAR11 = HHV(H,25)
+VAR22 = LLV(L,25)
+VAR33 = EMA((C-VAR22)/(VAR11-VAR22)*100,20)
+VAR44 = EMA((C-VAR22)/(VAR11-VAR22)*100,5)
 duanqimai = CROSS(VAR44,VAR33)
 
 ZJ = (C+H+L)/3
@@ -81,28 +83,30 @@ VAR1 = MA(ZJ,30)
 zhongxianqushi = VAR1+2.2*STD(ZJ,30)
 KS = (C-MA(C,13))/MA(C,13)*(-100)
 RKS = REF(KS,1)
-MLS = RKS/KS>=1.23 AND RKS>=8 AND C/REF(C,1)>=1.02
-FENG:=EMA(C,10);
-YUN:=EMA(KS/10+EMA(C,10),3);
-风云买:=CROSS(FENG,YUN);
+MLS = RKS/KS>=1.23 and RKS>=8 and C/REF(C,1)>=1.02
+FENG = EMA(C,10)
+YUN = EMA(KS / 10 + EMA(C,10),3)
+fengyunmai = CROSS(FENG, YUN)
 
-主力:=EMA( (CLOSE-MA(CLOSE,7))/MA(CLOSE,7)*480,2)*5;
-散户:=EMA( (CLOSE-MA(CLOSE,11))/MA(CLOSE,11)*480,7)*5;
-主力底:=CROSS(主力,散户) AND 主力<-10;
+zhuli = EMA((C-MA(C,7)) / MA(C,7)*480,2)*5
+sanhu = EMA( (C-MA(C,11))/MA(C,11)*480,7)*5
+zhulidi = CROSS(zhuli, sanhu) and zhuli<-10
 
-TD:=REF(H,1)>HHV(REF(H,2),20);
-TDT:=BARSLAST(TD);
+TD = REF(H,1)>HHV(REF(H,2),20)
 
-X_4:=MA((2*CLOSE+HIGH+LOW)/4,5);
-X_6:=X_4*0.98;
-X_25:=(MA(CLOSE,3)+MA(CLOSE,6)+MA(CLOSE,12)+MA(CLOSE,24))/4;
-乖离:=REF((X_6-X_25)/X_25*100,1);
+TDT = BARSLAST(TD)
 
-强势线1:=HHV(MA((((LOW + HIGH) + CLOSE)/3),8),60);
+X_4 = MA((2*C+H+L)/4,5)
+X_6 = X_4*0.98
+X_25 = (MA(C,3)+MA(C,6)+MA(C,12)+MA(C,24))/4
+guali = REF((X_6-X_25)/X_25*100,1)
 
-V11:=3*SMA((C-LLV(L,55))/(HHV(H,55)-LLV(L,55))*100,5,1)-2*SMA(SMA((C-LLV(L,55))/(HHV(H,55)-LLV(L,55))*100,5,1),3,1);
-趋势线:=EMA(V11,3);
+qiangshixian = HHV(MA((((L + H) + C)/3),8),60)
 
+V11=3*SMA((C-LLV(L,55))/(HHV(H,55)-LLV(L,55))*100,5,1)-2*SMA(SMA((C-LLV(L,55))/(HHV(H,55)-LLV(L,55))*100,5,1),3,1)
+qushixian=EMA(V11,3)
+
+print(qushixian.series.shape)
 # RSV:=(CLOSE-LLV(LOW,5))/(HHV(HIGH,5)-LLV(LOW,5))*100;
 # K:=SMA(RSV,5,1);
 # D:=SMA(K,5,5);
@@ -128,8 +132,8 @@ zijin = EMA(V, 13)
 guolv = ((zijin / liang) / 100)
 tichun = (((C -guolv) / guolv) * 100)
 huangjin = ((tichun < 0) and zxnh)
-dimai = 50 if huangjin and rsv < varb2-2 else 0
-gaomai = 80 if huangjin  and rsv > varb2 else 120
+dimai = IF(huangjin and rsv < varb2-2, 50, 0)
+gaomai = IF(huangjin  and rsv > varb2, 80, 120)
 shangzhangfenjie = 25
 KDJjincha = CROSS(shangzhangfenjie, dimai)
 print(KDJjincha)
@@ -138,8 +142,8 @@ V1 = (C*2+H+L)/4*10
 V2 = EMA(V1,13)-EMA(V1,21)
 V3 = EMA(V2,5)
 V4 = 2*(V2-V3)*100
-choumajin = V4 if V4 >= 0 else 0
-choumaxiuzheng = False if choumajin<REF(choumajin,1) and REF(C/O>1,1) else True
+choumajin = IF(V4 >= 0, V4, 0)
+choumaxiuzheng = IF(choumajin<REF(choumajin,1), False, True)
 
 X_4 = MA((2*C+H+L)/4,5)
 X_6 = X_4*0.98
@@ -178,3 +182,13 @@ gefengdibujiegou = (CL1 < CL3 and CL3 < CL2 ) and (MDIFB3 > MDIFL3) and (DMACD <
 BG = ((MDIFB2 > REF(MDIFB2,1))*REF(zhijiedibujiegou,2)) or ((MDIFB3 > REF(MDIFB3,2))*REF(gefengdibujiegou,2));
 P = CROSS(DDIFF,DDEA) and ~(N1>=16 and O/REF(C,1)<1.05)
 buy = FILTER(BG and P, DMACD>0)
+
+print(O, H, L, C, V)
+df = pd.DataFrame()
+df["open"] = O.series[-len(buy):]
+df["high"] = H.series[-len(buy):]
+df["low"] = L.series[-len(buy):]
+df["close"] = C.series[-len(buy):]
+df["datetime"] = DATETIME.series[-len(buy):]
+df["is_buy"] = buy
+print(df[df["is_buy"]==True])
